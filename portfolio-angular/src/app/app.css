@@ -1,0 +1,12 @@
+.container-central {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;       
+  padding: 20px;
+}
+
+.portfolio-card {
+  width: 100%;
+  max-width: 600px;
+}
