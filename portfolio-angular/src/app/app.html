@@ -1,44 +1,48 @@
-<mat-toolbar color="primary">
+<mat-drawer-container class="example-container" autosize>
+  
+  <mat-drawer #drawer class="example-sidenav" mode="side">
+    <mat-nav-list>
+      <a mat-list-item routerLink="/" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }" (click)="drawer.toggle()">
+        <mat-icon matListItemIcon>home</mat-icon>
+        <span matListItemTitle>Inicio</span>
+      </a>
+      <a mat-list-item routerLink="/sobre" routerLinkActive="ativo" (click)="drawer.toggle()">
+        <mat-icon matListItemIcon>person</mat-icon>
+        <span matListItemTitle>Sobre</span>
+      </a>
+      <a mat-list-item routerLink="/projetos" routerLinkActive="ativo" (click)="drawer.toggle()">
+        <mat-icon matListItemIcon>work</mat-icon>
+        <span matListItemTitle>Projetos</span>
+      </a>
+      <a mat-list-item routerLink="/contato" routerLinkActive="ativo" (click)="drawer.toggle()">
+        <mat-icon matListItemIcon>mail</mat-icon>
+        <span matListItemTitle>Contato</span>
+      </a>
+    </mat-nav-list>
+  </mat-drawer>
 
-<span>Meu Portfolio</span>
-<span class="espacador"></span>
-<a mat-button routerLink="/" routerLinkActive="ativo"  [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
-<a mat-button routerLink="/sobre" routerLinkActive="ativo" >Sobre</a>
-<a mat-button routerLink="/projetos" routerLinkActive="ativo" >Projetos</a>
-<a mat-button routerLink="/contato" routerLinkActive="ativo" >Contato</a>
+  <div class="example-sidenav-content">
+    
+    <mat-toolbar color="primary">
+      <button mat-icon-button (click)="drawer.toggle()" aria-label="Toggle sidenav">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span style="margin-left: 8px;">Meu Portfolio</span>
 
-</mat-toolbar>
+      <span class="espacador"></span>
 
-<mat-sidenav mode="side" opened color="primary">
+      <div>
+        <a mat-button routerLink="/" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+        <a mat-button routerLink="/sobre" routerLinkActive="ativo">Sobre</a>
+        <a mat-button routerLink="/projetos" routerLinkActive="ativo">Projetos</a>
+        <a mat-button routerLink="/contato" routerLinkActive="ativo">Contato</a>
+      </div>
+    </mat-toolbar>
 
+    <main style="padding: 24px">
+      <router-outlet></router-outlet>
+    </main>
 
+  </div>
 
-<button matIconButton [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
-  <mat-icon>Inicio</mat-icon>
-</button>
-<mat-menu #menu="matMenu">
-  <button mat-menu-item>
-    <mat-icon>notifications_off</mat-icon>
-    <span><a mat-button routerLink="/" routerLinkActive="ativo" >Inicio</a></span>
-  </button>
-  <button mat-menu-item>
-    <mat-icon>dialpad</mat-icon>
-    <span><a mat-button routerLink="/sobre" routerLinkActive="ativo" >Sobre</a></span>
-  </button>
-  <button mat-menu-item disabled>
-    <mat-icon>voicemail</mat-icon>
-    <span><a mat-button routerLink="/projetos" routerLinkActive="ativo" >Projetos</a></span>
-  </button>
-  <button mat-menu-item>
-    <mat-icon>notifications_off</mat-icon>
-    <span><a mat-button routerLink="/contato" routerLinkActive="ativo" >Contato</a></span>
-  </button>
-</mat-menu>
-
-
-
-</mat-sidenav>
-
-<main style="padding: 24px">
-  <router-outlet></router-outlet>
-</main>
+</mat-drawer-container>
