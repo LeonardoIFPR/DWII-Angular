@@ -48,3 +48,13 @@ CREATE TABLE tecnologias (
     criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+## 🎯 Autoavaliação
+Conceito pretendido: A
+
+Justificativa (cite o arquivo de cada critério):
+- Consumo da API (Projetos): projeto.service.ts (GET) + projetos.ts (subscribe)
+- Catalogo + botao GitHub: tecnologia.service.ts + projetos.html (mat-card-actions)
+- Boas praticas: a URL/HTTP fica no service; o componente so exibe
+- Acho que fui bem, busco o conceito A nesta atividade minhas alterações nos arquivos para isso foram o uso do async para fazer com que carregase os dados sem ter que clicar no link 2 vezes e um if else nos arquivos para mostrar uma determinada mensagem caso não haja projetos ou tecnologias cadastradas 
