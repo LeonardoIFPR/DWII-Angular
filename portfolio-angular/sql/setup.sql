@@ -8,6 +8,7 @@ INSERT INTO projetos (nome, descricao, tecnologias, link_github, ano, status) VA
 ('API de Clima',                 'Microsservico que consome uma API publica e devolve a previsao em JSON.',    'PHP, REST',                'https://github.com/usuario/clima',      2026, 'publicado'),
 ('Jogo da Velha (em construcao)','Jogo da velha local - ainda em desenvolvimento.',                            'JavaScript, HTML',         NULL,                                    2026, 'rascunho');
 
+
 INSERT INTO tecnologias (nome, categoria, descricao, ano_criacao) VALUES
 ('HTML',       'Frontend',       'Linguagem de marcacao para estrutura de paginas.', 1993),
 ('CSS',        'Frontend',       'Linguagem de estilos para apresentacao visual.',   1996),
