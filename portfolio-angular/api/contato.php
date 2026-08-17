@@ -1,15 +1,15 @@
 <?php
-header("access-control-allow-origin: *");
-header("access-control-allow-methods: POST, OPTIONS");
-header("access-control-allow-headers: content-type");
-header("content-type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-type");
+header("Content-Type: application/json; charset=UTF-8");
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit(); }
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit(); }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(['error' => 'Use POST.']);
-    exit();
+    echo json_encode(['erro' => 'Use POST.']);
+    exit;
 }
 
 $dados = json_decode(file_get_contents('php://input'), true);
@@ -22,12 +22,12 @@ $erros = [];
 if ($nome === "") $erros[] = "nome é obrigatório.";
 if ($email === "") $erros[] = "email é obrigatório.";
 elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $erros[] = "o email é inválido.";
-if ($mensagem === "") $erros[] = "mensagem é  obrigatório.";
+if (mb_strlen($mensagem) < 10) $erros[] = "Mensagem com +10 caracteres";
 
 if (!empty($erros)) {
     http_response_code(400);
     echo json_encode(['error' => $erros]);
-    exit();
+    exit;
 }
 
 require __DIR__ . "/../conexao.php";

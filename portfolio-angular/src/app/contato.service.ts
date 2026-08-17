@@ -13,7 +13,7 @@ export interface RespostaContato {
 @Injectable({providedIn: 'root'})
 export class ContatoService {
   private http = inject(HttpClient);
-  private Url = "http://localhost:8000/api/contato.php";
+  private Url = "https://crispy-dollop-wr64g4jr656p35r5v-8000.app.github.dev/api/contato.php";
 
   enviar(dados: NovoContato): Observable<RespostaContato> {
     return this.http.post<RespostaContato>(this.Url, dados);
