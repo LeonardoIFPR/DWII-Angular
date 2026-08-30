@@ -22,7 +22,7 @@ $erros = [];
 if ($nome === "") $erros[] = "nome é obrigatório.";
 if ($email === "") $erros[] = "email é obrigatório.";
 elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $erros[] = "o email é inválido.";
-if (mb_strlen($mensagem) < 10) $erros[] = "Mensagem com +10 caracteres";
+if (strlen($mensagem) < 10) $erros[] = "Mensagem deve ter pelo menos 10 caracteres.";
 
 if (!empty($erros)) {
     http_response_code(400);

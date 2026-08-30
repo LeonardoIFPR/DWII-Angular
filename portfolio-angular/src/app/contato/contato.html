@@ -2,13 +2,26 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <label for="nome">Nome</label>
   <input id="nome" type="text" formControlName="nome">
+  @if (form.controls.nome.touched && form.controls.nome.invalid) {
+    <p class="erro">Nome deve ter pelo menos 3 caracteres.</p>
+  }
+
   <label for="email">E-mail</label>
   <input id="email" type="email" formControlName="email">
+  @if (form.controls.email.touched && form.controls.email.invalid) {
+    <p class="erro">Digite um e-mail válido.</p>
+  }
+
   <label for="mensagem">Mensagem</label>
   <textarea id="mensagem" formControlName="mensagem" rows="4"></textarea>
+  @if (form.controls.mensagem.touched && form.controls.mensagem.invalid) {
+    <p class="erro">Mensagem deve ter pelo menos 10 caracteres.</p>
+  }
+
   <button type="submit" [disabled]="enviando">
     {{ enviando ? 'Enviando...' : 'Enviar' }}
   </button>
 </form>
+
 @if (sucesso) { <p class="ok">{{ sucesso }}</p> }
-@if (erro)    { <p class="erro">{{ erro }}</p> }
+@if (erro) { <p class="erro">{{ erro }}</p> }

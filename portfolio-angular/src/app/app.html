@@ -22,6 +22,10 @@
         <mat-icon matListItemIcon>mail</mat-icon>
         <span matListItemTitle>Contato</span>
       </a>
+      <a mat-list-item routerLink="/gestao" routerLinkActive="ativo" (click)="drawer.toggle()">
+        <mat-icon matListItemIcon>mail</mat-icon>
+        <span matListItemTitle>Gestão</span>
+      </a>
     </mat-nav-list>
   </mat-drawer>
 
@@ -41,6 +45,7 @@
         <a mat-button routerLink="/projetos" routerLinkActive="ativo">Projetos</a>
         <a mat-button routerLink="/catalogo" routerLinkActive="ativo">Catálogo</a>
         <a mat-button routerLink="/contato" routerLinkActive="ativo">Contato</a>
+        <a mat-button routerLink="/gestao" routerLinkActive="ativo">Gestão</a>
       </div>
     </mat-toolbar>
 
