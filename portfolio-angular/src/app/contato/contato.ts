@@ -24,7 +24,6 @@ export class Contato {
         this.form.markAllAsTouched();
         return;
     }
-    // @ts-ignore
     this.enviando = true;
     this.service.enviar(this.form.getRawValue() as NovoContato).subscribe({
         next: (resp) => {

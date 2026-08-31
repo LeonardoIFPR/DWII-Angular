@@ -1,15 +1,56 @@
-<mat-card>
+<div class="sobre-container">
+
+  <header class="sobre-header">
+    <h1>Sobre mim</h1>
+    <p>Estudante de Informática no IFPR, apaixonado por programação.</p>
+  </header>
+
+  <mat-card>
     <mat-card-header>
-        <mat-card-title>Olá, meu nome é Leonardo</mat-card-title>
-        <mat-card-subtitle>Aqui você verá algumas informações sobre mim.</mat-card-subtitle>
+      <mat-card-title>Leonardo Garbuio Cavalheiro</mat-card-title>
+      <mat-card-subtitle>Técnico em Informática — IFPR CRPG · 17 anos</mat-card-subtitle>
     </mat-card-header>
-    
     <mat-card-content>
-        <ul>
-            <li>Sou um estudante de informática do IFPR CRPG</li>
-            <li>Tenho 17 anos</li>
-            <li>Gosto de programar e pretendo seguir na área</li>
-            <li>Tenho experiência com JavaScript, Python e Swift</li>
-        </ul>
+      <p>
+        Sou estudante de Técnico em Informática no IFPR. Nunca imaginei que gostaria tanto de
+        programar, mas me apeguei à área e hoje dedico meu tempo a criar projetos e aprender
+        tecnologias novas.
+      </p>
+      <p>
+        Atualmente estou desenvolvendo um <strong>laboratório 3D</strong> interativo baseado
+        em química e física reais, utilizando modelagem matemática.
+      </p>
     </mat-card-content>
-</mat-card>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Habilidades</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="skill-list">
+        <span class="skill-tag">Angular</span>
+        <span class="skill-tag">TypeScript</span>
+        <span class="skill-tag">JavaScript</span>
+        <span class="skill-tag">HTML & CSS</span>
+        <span class="skill-tag">Python</span>
+        <span class="skill-tag">Node.js</span>
+        <span class="skill-tag">Swift</span>
+        <span class="skill-tag">Git</span>
+        <span class="skill-tag">Cyber Security</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Entre em contato</mat-card-title>
+      <mat-card-subtitle>Aberto a colaborações e oportunidades</mat-card-subtitle>
+    </mat-card-header>
+    <div class="card-actions">
+      <button mat-stroked-button routerLink="/contato">Contato</button>
+      <button mat-button routerLink="/projetos">Ver projetos</button>
+    </div>
+  </mat-card>
+
+</div>
