@@ -1,13 +1,13 @@
-<h2>Fale comigo</h2>
+<h2>Área Restrita</h2>
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <label for="usuario">Nome</label>
-  <input id="nome" type="text" formControlName="nome">
+  <label for="usuario">Usuário</label>
+  <input id="usuario" type="text" formControlName="usuario">
 
-  <label for="senha">E-mail</label>
-  <input id="email" type="email" formControlName="email">
+  <label for="senha">Senha</label>
+  <input id="senha" type="password" formControlName="senha">
 
   <button type="submit" [disabled]="enviando">
-    {{ enviando ? 'Enviando...' : 'Enviar' }}
+    {{ enviando ? 'Entrando...' : 'Entrar' }}
   </button>
 </form>
 

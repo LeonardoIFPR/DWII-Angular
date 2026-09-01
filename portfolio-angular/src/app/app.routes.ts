@@ -6,6 +6,7 @@ import { Contato } from "./contato/contato";
 import { Catalogo } from './catalogo/catalogo';
 import { Gestao } from './gestao/gestao';
 import { Autenticacao } from './sessao/includes/autenticacao/autenticacao';
+import { authGuard } from './auth';
 
 export const routes: Routes = [
     {path: "", component: Home},
@@ -13,7 +14,6 @@ export const routes: Routes = [
     {path: "projetos", component: Projetos},
     {path: "contato", component: Contato},
     {path: 'catalogo', component: Catalogo },
-    {path: 'gestao', component: Gestao},
-    {path: 'autenticaacao', component: Autenticacao},
+    {path: 'gestao', component: Gestao, canActivate: [authGuard]},
+    {path: 'autenticacao', component: Autenticacao}, 
 ];
-

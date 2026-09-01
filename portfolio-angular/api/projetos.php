@@ -82,7 +82,7 @@ if ($metodo === "DELETE") {
     }
 
     $sql = "DELETE FROM projetos WHERE id = ?";
-    $stmt = pdo->prepare($sql);
+    $stmt = $pdo->prepare($sql);
     $stmt->execute([$id]);
 
     if ($stmt->rowCount() === 0) {

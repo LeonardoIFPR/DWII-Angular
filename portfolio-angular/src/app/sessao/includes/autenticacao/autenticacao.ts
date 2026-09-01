@@ -1,7 +1,7 @@
 import { Component, inject } from "@angular/core";
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { autenticacao } from '../../../autenticacao.service'; 
+import { AutenticacaoService } from '../../../autenticacao.service'; 
 
 export interface Novaautenticacao {
   usuario: string; senha: string;
@@ -17,9 +17,11 @@ export interface Novaautenticacao {
 export class Autenticacao { 
   private fb = inject(FormBuilder);
   private router = inject(Router);
-  private service = inject(autenticacao); 
+  private service = inject(AutenticacaoService); 
 
   erro = "";
+  sucesso = "";
+  enviando = false;
 
   form = this.fb.group({
     senha: ['', [Validators.required, Validators.minLength(3)]],
@@ -29,14 +31,19 @@ export class Autenticacao {
   onSubmit() {
     if (this.form.invalid) return;
 
+    this.erro = "";
+    this.enviando = true;
+
     const dadosLogin = this.form.value;
     
     this.service.fazerLogin(dadosLogin).subscribe({
-      next: (resposta) => {
+      next: (resposta: any) => {
+        this.service.liberarAcesso();
         this.router.navigate(['/gestao']); 
       },
-      error: (erro) => {
+      error: (erro: any) => {
         this.erro = "Usuário ou senha incorretos!"; 
+        this.enviando = false;
       }
     });
   }
