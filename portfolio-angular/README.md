@@ -57,3 +57,30 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## 🎯 Autoavaliação 17
+Conceito pretendido: A
+
+Justificativa (cite o arquivo de cada critério):
+- Consumo da API (Projetos): projeto.service.ts (GET) + projetos.ts (subscribe)
+- Catalogo + botao GitHub: tecnologia.service.ts + projetos.html (mat-card-actions)
+- Boas praticas: a URL/HTTP fica no service; o componente so exibe
+- Uso do asyncpipe para não ser necessario recarregar a tela para mostrar os dado
+- Uso de @for e @ifs para quando der algum problema no backend mostrar mensagem de erro e uso do for para
+
+
+
+## 🎯 Autoavaliação 18
+
+Conceito pretendido: A
+
+Justificativa (cite o arquivo de cada critério):
+- Formulario reativo + validações: contato.ts (Validators) + contato.html (mensagens usando touched e invalid)
+- Botao de envio: contato.html ([disabled]="form.invalid || enviando") para não enviar formulario invalido ou enquanto estiver enviando
+- Estado de envio: contato.ts + contato.html (uso da variavel enviando e texto "Enviando...")
+- Tratamento de sucesso e erro: contato.ts (subscribe com next e error, form.reset() quando der certo e reabilita o botao quando der erro)
+- Erros do backend: contato.ts (HttpErrorResponse + err.error?.erros) para mostrar os erros que vierem da API
+- Backend: api/contato.php (php://input, validação dos campos, prepare(), retorno 400 quando tiver erro e 201 quando salvar)
+- Acessibilidade/UX: contato.html (labels com for/id e mensagens de erro em texto) + contato.ts (foco no primeiro campo invalido)
+- Autoavaliação: esta seção do README
+

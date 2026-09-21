@@ -26,7 +26,7 @@ if (strlen($mensagem) < 10) $erros[] = "Mensagem deve ter pelo menos 10 caracter
 
 if (!empty($erros)) {
     http_response_code(400);
-    echo json_encode(['error' => $erros]);
+    echo json_encode(['erros' => $erros]);
     exit;
 }
 

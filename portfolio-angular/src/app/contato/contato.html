@@ -18,7 +18,7 @@
     <p class="erro">Mensagem deve ter pelo menos 10 caracteres.</p>
   }
 
-  <button type="submit" [disabled]="enviando">
+  <button type="submit" [disabled]="form.invalid || enviando">
     {{ enviando ? 'Enviando...' : 'Enviar' }}
   </button>
 </form>
