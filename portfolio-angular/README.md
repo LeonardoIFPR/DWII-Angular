@@ -58,6 +58,37 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 
+
+## Navegação e Layout 14
+Nesta etapa foi criada a estrutura principal de navegação do portfolio.
+- app.routes.ts: possui as quatro rotas da aplicação
+- app.html: menu usando routerLink e routerLinkActive
+- app.css: estilização do link ativo no menu
+- Sobre: apresenta informações sobre mim e o laboratorio 3D que estou desenvolvendo
+- mat-drawer: menu responsivo para navegação em dispositivos menores
+
+Com isso a aplicação passou a ter uma estrutura de navegação completa tanto no computador quanto no celular.
+
+
+
+## API e Banco de Dados 15
+Para rodar o projeto:
+1. Instale as dependências necessárias do projeto.
+2. Crie o banco executando:
+sudo mariadb < sql/setup.sql
+3. Inicie a API:
+php -S 0.0.0.0:8000
+
+Endpoints:
+- api/projetos.php: lista os projetos publicados
+- api/tecnologias.php: lista as tecnologias
+- api/tecnologias.php?id=ID: busca uma tecnologia pelo id
+
+O sql/setup.sql recria o banco, o usuario e as tabelas projetos e tecnologias.
+A API retorna JSON, possui CORS e usa prepare() nas consultas que recebem dados pela URL.
+
+
+
 ## 🎯 Autoavaliação 17
 Conceito pretendido: A
 
@@ -84,3 +115,29 @@ Justificativa (cite o arquivo de cada critério):
 - Acessibilidade/UX: contato.html (labels com for/id e mensagens de erro em texto) + contato.ts (foco no primeiro campo invalido)
 - Autoavaliação: esta seção do README
 
+
+
+## 🎯 Autoavaliação 19
+Conceito pretendido: A
+Justificativa:
+- Gestão completa: gestao.ts + gestao.html (listar, adicionar, editar, excluir, atualizar sem F5 e resetar o formulário)
+- Status: gestao.html + projeto.service.ts + api/projetos.php (rascunho/publicado, gestão mostra todos e portfólio só publicados)
+- Erros e UX: gestao.ts + gestao.html (erros visíveis ao carregar, salvar e excluir + mensagem para lista vazia)
+- Backend: api/projetos.php (GET, POST, PUT, DELETE e OPTIONS, prepare/execute e retornos 200, 201, 204, 400, 404 e 405)
+- Boas práticas: requisições ficam no projeto.service.ts e não no gestao.ts
+
+O mesmo api/projetos.php faz varias operações porque verifica o REQUEST_METHOD e executa uma ação diferente para cada verbo HTTP.
+O estado salvando bloqueia o botão durante o POST e ajuda a impedir dois cadastros caso o usuario clique duas vezes rapidamente.
+Depois de salvar uso carregar(), que consulta novamente o servidor. No excluir uso filter(), que economiza uma requisição, mas pode ficar desatualizado se o banco mudar por fora.
+Como polimento foi criado um estado de lista vazia em gestao.html. Fonte pesquisada: Nielsen Norman Group sobre empty states.
+O OPTIONS funciona como preflight: o navegador verifica antes se o servidor permite métodos como DELETE.
+
+Um <a href> faz GET e não DELETE, então não substitui o botão de excluir. Evidência:
+curl -i "URL/api/projetos.php?id=5"
+curl -i -X DELETE "URL/api/projetos.php?id=5"
+
+## Testes da API
+- 400: curl -i -X POST "URL/api/projetos.php" -H "Content-Type: application/json" -d '{}' → [colar resultado]
+- 404: curl -i -X DELETE "URL/api/projetos.php?id=999999" → [colar resultado]
+- 405: curl -i -X PATCH "URL/api/projetos.php" → [colar resultado]
+- OPTIONS: curl -i -X OPTIONS "URL/api/projetos.php" → [colar 204 + Access-Control-Allow-Methods]

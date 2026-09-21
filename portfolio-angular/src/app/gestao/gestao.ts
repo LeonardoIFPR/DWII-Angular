@@ -13,8 +13,8 @@ export class Gestao implements OnInit {
 
   projetos: Projeto[] = [];
   carregando = true;
-  erro = '';
-
+  erroLista = '';
+  erroSalvar = '';
   editandoId: number | null = null;
   salvando = false;
 
@@ -23,7 +23,8 @@ export class Gestao implements OnInit {
     descricao: new FormControl(''),
     tecnologias: new FormControl(''),
     link_github: new FormControl(''),
-    ano: new FormControl(2026, [Validators.required])
+    ano: new FormControl(2026, [Validators.required]),
+    status: new FormControl('publicado', [Validators.required])
   });
 
   ngOnInit() {
@@ -32,19 +33,22 @@ export class Gestao implements OnInit {
 
   carregar() {
     this.carregando = true;
-    this.service.listar().subscribe({
+    this.erroLista = '';
+
+    this.service.listarTodos().subscribe({
       next: (lista) => {
         this.projetos = lista;
         this.carregando = false;
       },
       error: () => {
-        this.erro = 'Não foi possível carregar os projetos.';
+        this.erroLista = 'Não foi possível carregar os projetos.';
         this.carregando = false;
       }
     });
   }
 
   editar(p: Projeto) {
+    this.erroSalvar = '';
     this.editandoId = p.id ?? null;
     this.form.patchValue(p);
   }
@@ -56,7 +60,7 @@ export class Gestao implements OnInit {
     }
 
     this.salvando = true;
-    this.erro = '';
+    this.erroSalvar = '';
 
     const dados = this.form.value as Projeto;
 
@@ -67,10 +71,13 @@ export class Gestao implements OnInit {
     requisicao.subscribe({
       next: () => {
         this.salvando = false;
+        this.editandoId = null;
+        this.form.reset({ ano: 2026, status: 'publicado' });
+        this.carregar();
       },
       error: () => {
         this.salvando = false;
-        this.erro = 'Não foi possível salvar. Tente de novo.';
+        this.erroSalvar = 'Não foi possível salvar. Tente de novo.';
       }
     });
   }
@@ -84,12 +91,14 @@ export class Gestao implements OnInit {
       return;
     }
 
+    this.erroLista = '';
+
     this.service.excluir(p.id).subscribe({
       next: () => {
         this.projetos = this.projetos.filter(x => x.id !== p.id);
       },
       error: () => {
-        this.erro = 'Não foi possível excluir. Tente de novo.';
+        this.erroLista = 'Não foi possível excluir. Tente de novo.';
       }
     });
   }

@@ -20,7 +20,14 @@ $metodo = $_SERVER["REQUEST_METHOD"];
 $id = isset($_GET["id"]) ? (int) $_GET["id"] : 0;
 
 if ($metodo === "GET") {
-    $sql = "SELECT id, nome, descricao, tecnologias, link_github, ano FROM projetos WHERE status ='publicado' ";
+    $todos = isset($_GET["todos"]) && $_GET["todos"] === "1";
+
+    if ($todos) {
+        $sql = "SELECT id, nome, descricao, tecnologias, link_github, ano, status FROM projetos";
+    } else {
+        $sql = "SELECT id, nome, descricao, tecnologias, link_github, ano, status FROM projetos WHERE status = 'publicado'";
+    }
+
     $projetos = $pdo->query($sql)->fetchAll();
     echo json_encode($projetos);
     exit;
@@ -28,11 +35,21 @@ if ($metodo === "GET") {
 
 if ($metodo === "POST") {
     $dados = json_decode(file_get_contents("php://input"), true);
+
     if (!$dados || empty($dados["nome"])) {
         http_response_code(400);
-        echo json_encode(["erro" => "informa pelo menos um projeto"]);
+        echo json_encode(["erro" => "informe pelo menos o nome de um projeto"]);
         exit;
     }
+
+    $status = $dados["status"] ?? "publicado";
+
+    if (!in_array($status, ["rascunho", "publicado", "arquivado"])) {
+        http_response_code(400);
+        echo json_encode(["erro" => "status inválido"]);
+        exit;
+    }
+
     $sql = "INSERT INTO projetos (nome, descricao, tecnologias, link_github, ano, status) VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
@@ -41,8 +58,9 @@ if ($metodo === "POST") {
         $dados["tecnologias"] ?? "",
         $dados["link_github"] ?? "",
         $dados["ano"] ?? date("Y"),
-        "publicado",
+        $status,
     ]);
+
     http_response_code(201);
     echo json_encode(["id" => (int) $pdo->lastInsertId()]);
     exit;
@@ -51,25 +69,48 @@ if ($metodo === "POST") {
 if ($metodo === "PUT") {
     if ($id <= 0) {
         http_response_code(400);
-        echo json_encode(["erro" => "PUT exige o id na URL: ?id-NN"]);
+        echo json_encode(["erro" => "PUT exige o id na URL: ?id=NN"]);
         exit;
     }
+
     $dados = json_decode(file_get_contents("php://input"), true);
+
     if (!$dados || empty($dados["nome"])) {
         http_response_code(400);
         echo json_encode(["erro" => "informe pelo menos o nome de um projeto"]);
         exit;
     }
-    $sql = "UPDATE projetos SET nome = ?, descricao = ?, tecnologias = ?, link_github = ?, ano = ? WHERE id = ?";
+
+    $status = $dados["status"] ?? "publicado";
+
+    if (!in_array($status, ["rascunho", "publicado", "arquivado"])) {
+        http_response_code(400);
+        echo json_encode(["erro" => "status inválido"]);
+        exit;
+    }
+
+    $verifica = $pdo->prepare("SELECT id FROM projetos WHERE id = ?");
+    $verifica->execute([$id]);
+
+    if (!$verifica->fetch()) {
+        http_response_code(404);
+        echo json_encode(["erro" => "projeto não encontrado"]);
+        exit;
+    }
+
+    $sql = "UPDATE projetos SET nome = ?, descricao = ?, tecnologias = ?, link_github = ?, ano = ?, status = ? WHERE id = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         $dados["nome"],
         $dados["descricao"] ?? "",
         $dados["tecnologias"] ?? "",
         $dados["link_github"] ?? "",
-        $dados["ano"] ?? date("Y"), 
-        $id,       
+        $dados["ano"] ?? date("Y"),
+        $status,
+        $id,
     ]);
+
+    http_response_code(200);
     echo json_encode(["mensagem" => "projeto atualizado"]);
     exit;
 }
@@ -90,6 +131,7 @@ if ($metodo === "DELETE") {
         echo json_encode(["erro" => "projeto não encontrado"]);
         exit;
     }
+
     http_response_code(204);
     exit;
 }
