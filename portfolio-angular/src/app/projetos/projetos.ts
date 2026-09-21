@@ -1,8 +1,9 @@
 import { Component, inject } from '@angular/core';
+import { ProjetoService } from '../projeto.service';
 import { MatCardModule } from '@angular/material/card';
-import { Projeto, ProjetoService } from '../projeto.service';
 import { MatButtonModule } from '@angular/material/button';
 import { AsyncPipe } from '@angular/common';
+import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-projetos',
@@ -13,5 +14,12 @@ import { AsyncPipe } from '@angular/common';
 export class Projetos {
   private service = inject(ProjetoService);
 
-  projetos$ = this.service.listar();
+  erro = false;
+
+  projetos$ = this.service.listar().pipe(
+    catchError(() => {
+      this.erro = true;
+      return of([]);
+    })
+  );
 }

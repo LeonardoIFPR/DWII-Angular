@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
-import { Tecnologia, TecnologiaService } from '../tecnologia.service';
+import { TecnologiaService } from '../tecnologia.service';
 import { AsyncPipe } from '@angular/common';
+import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-catalogo',
@@ -12,5 +13,12 @@ import { AsyncPipe } from '@angular/common';
 export class Catalogo {
   private service = inject(TecnologiaService);
 
-  tecnologias$ = this.service.listar();
+  erro = false;
+
+  tecnologias$ = this.service.listar().pipe(
+    catchError(() => {
+      this.erro = true;
+      return of([]);
+    })
+  );
 }

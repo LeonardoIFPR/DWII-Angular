@@ -1,4 +1,6 @@
-@if (projetos$ | async; as projetos) {
+@if (erro) {
+    <p>Erro ao carregar projetos.</p>
+} @else if (projetos$ | async; as projetos) {
     @for (p of projetos; track p.id) {
         <mat-card style="margin-bottom: 12px">
             <mat-card-header>
