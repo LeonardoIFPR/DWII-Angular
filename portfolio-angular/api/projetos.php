@@ -139,3 +139,4 @@ if ($metodo === "DELETE") {
 http_response_code(405);
 echo json_encode(["erro" => "metodo não permitido"]);
 ?>
+
