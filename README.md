@@ -58,3 +58,17 @@ Justificativa (cite o arquivo de cada critério):
 - Catalogo + botao GitHub: tecnologia.service.ts + projetos.html (mat-card-actions)
 - Boas praticas: a URL/HTTP fica no service; o componente so exibe
 - Acho que fui bem, busco o conceito A nesta atividade minhas alterações nos arquivos para isso foram o uso do async para fazer com que carregase os dados sem ter que clicar no link 2 vezes e um if else nos arquivos para mostrar uma determinada mensagem caso não haja projetos ou tecnologias cadastradas 
+
+### aula 22:a API le o banco  
+
+antes de subir o Banco o MARIADB precisa estar de pe 
+
+    sudo service mariadb start
+    cd api-node
+    node server.js
+
+Rotas que leem do "dwii_db"
+
+    curl -i http://localhost:3000/api/projetos
+    curl -i http://localhost:3000/api/projetos/5
+    curl -i http://localhost:3000/api/tecnologias

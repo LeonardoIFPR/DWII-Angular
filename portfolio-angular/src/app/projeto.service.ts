@@ -15,7 +15,7 @@ export interface Projeto {
 @Injectable({providedIn: 'root'})
 export class ProjetoService {
     private http = inject(HttpClient)
-    private url = "https://crispy-dollop-wr64g4jr656p35r5v-8000.app.github.dev/api/projetos.php";
+    private url = "https://crispy-dollop-wr64g4jr656p35r5v-3000.app.github.dev/api/projetos";
 
     listar(): Observable<Projeto[]> {
         return this.http.get<Projeto[]>(this.url);
