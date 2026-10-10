@@ -82,3 +82,10 @@ repositorio como historico do 2o trimestre.
     curl -i -X POST http://localhost:3000/api/projetos -H "Content-Type: application/json" -d '{"nome":"Projeto de teste","ano":2026}'
     curl -i -X PUT http://localhost:3000/api/projetos/7 -H "Content-Type: application/json" -d '{"nome":"Projeto de teste (editado)","ano":2026}'
     curl -i -X DELETE http://localhost:3000/api/projetos/7
+
+### Modificação propria Login funcional usando Node.js
+
+a API usa variaveis locais definidas no codigo para autenticar um usuario como admin e dar acesso a area "Gestão"
+
+    usuario: Admin
+    senha: 24446666688888888

@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class AutenticacaoService {
   private http = inject(HttpClient);
-  private apiUrl = 'https://crispy-dollop-wr64g4jr656p35r5v-8000.app.github.dev/api/login.php'; 
+  private apiUrl = 'https://crispy-dollop-wr64g4jr656p35r5v-3000.app.github.dev/api/login'; 
   
   private autorizado = false;
 
