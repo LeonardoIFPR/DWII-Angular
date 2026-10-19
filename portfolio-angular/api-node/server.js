@@ -1,9 +1,12 @@
 const express = require("express");
 const cors = require("cors");
-const pool = require("./db")
+const pool = require("./db");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 const PORTA = 3000;
+const SEGREDO = "24446666688888888"
 
 app.use(cors());
 app.use(express.json())
@@ -38,7 +41,7 @@ app.get("/api/projetos/:id", async (req, res) => {
     res.json(linhas[0]);
 });
 
-app.post("/api/projetos", async (req, res) => {
+app.post("/api/projetos", autenticar, async (req, res) => {
     try {
         const dados = req.body;
         console.log(dados);
@@ -55,7 +58,7 @@ app.post("/api/projetos", async (req, res) => {
     };
 });
 
-app.put("/api/projetos/:id", async (req, res) => {
+app.put("/api/projetos/:id", autenticar, async (req, res) => {
     try {
         const dados = req.body;
         if (!dados || !dados.nome) {
@@ -87,7 +90,7 @@ app.delete("/api/projetos/:id", async (req, res) => {
 });
 
 
-app.post("/api/tecnologias", async (req, res) => {
+app.post("/api/tecnologias", autenticar, async (req, res) => {
     try {
         const dados = req.body;
         console.log(dados);
@@ -96,7 +99,7 @@ app.post("/api/tecnologias", async (req, res) => {
         }
         const sql = "insert into tecnologias (nome, categoria, descricao, ano_criacao) values (?, ?, ?, ?)";
         const [resultado] = await pool.execute(sql, [
-            dados.nome, dados.descricao ?? "", dados.descricao ?? "", dados.ano_criacao ?? new Date().getFullYear()
+            dados.nome, dados.categoria ?? "", dados.descricao ?? "", dados.ano_criacao ?? new Date().getFullYear()
         ]);
         res.status(201).json({id: resultado.insertId });
     } catch (erro) {
@@ -104,7 +107,7 @@ app.post("/api/tecnologias", async (req, res) => {
     };
 });
 
-app.put("/api/tecnologias/:id", async (req, res) => {
+app.put("/api/tecnologias/:id", autenticar, async (req, res) => {
     try {
         const dados = req.body;
         if (!dados || !dados.nome) {
@@ -136,26 +139,40 @@ app.delete("/api/tecnologias/:id", async (req, res) => {
 });
 
 app.post("/api/login", async (req, res) => {
-    try {
+    try{
         const dados = req.body;
-        console.log(dados);
-        if (!dados || !dados.usuario || !dados.senha) {
-            return res.status(400).json({ erro: "Informe o Usuario ou Senha"});
-        };
-
-        const usuarioCorreto = "Admin";
-        const senhaCorreta = "24446666688888888";
-
-        if (usuarioCorreto === dados.usuario && senhaCorreta === dados.senha){
-            return res.status(200).json({ status: "Credenciais validas" });
-        } else {
-             return res.status(401).json({ erro: "Credenciais inválidas" });
+        if (!dados || !dados.email || !dados.senha) {
+            return res.status(400).json({erro: "Informe email e senha"});
         }
+        const [linhas] = await pool.execute("select id, email, senha_hash from usuarios where email = ?", [dados.email]);
+        const usuario = linhas[0];
+        if (!usuario) {
+            return res.status(401).json({erro: "Email e senha invalidos"});
+        }
+        const confere = await bcrypt.compare(dados.senha, usuario.senha_hash);
+        if (!confere) {
+            return res.status(401).json({erro: "Email ou senha invalidos"});
+        }
+        const token = jwt.sign({ id: usuario.id, email: usuario.email }, SEGREDO, {expiresIn: "2h"}); 
+        res.json({ token });
     } catch (erro) {
-        res.status(500).json({ erro: "Falha no servidor: " + erro.message });
-
+        res.status(500).json({ erro: "Falha no servidor: " + erro.message})
     }
 });
+
+function autenticar(req, res, next) {
+  const cabecalho = req.headers.authorization ?? '';
+  const token = cabecalho.replace('Bearer ', '');
+  if (!token) {
+    return res.status(401).json({ erro: 'Token ausente' });
+  }
+  try {
+    req.usuario = jwt.verify(token, SEGREDO);
+    next();
+  } catch (erro) {
+    return res.status(401).json({ erro: 'Token invalido ou expirado' });
+  }
+}
 
 
 
