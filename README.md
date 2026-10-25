@@ -97,3 +97,181 @@ Login e escrita com o token:
     curl -i -X POST http://localhost:3000/api/login -H "Content-Type: application/json" -d '{"email":"dono@portfolio.dev","senha":"portfolio2026"}'
     curl -i -X POST http://localhost:3000/api/projetos -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"nome":"Projeto com tranca","ano":2026}'
     curl -i -X PUT http://localhost:3000/api/projetos/8 -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"nome":"Projeto com tranca (editado)","ano":2026}'
+
+
+### Aula 24: melhorias na API e autenticação
+
+Alterações para melhorar a segurança e o funcionamento da API.
+
+- Adicionamos `try/catch` no GET por ID para tratar erros do servidor com status 500.
+- Criamos o GET `/api/projetos/todos`, que permite visualizar projetos publicados e rascunhos somente com token.
+- Protegemos os DELETE de projetos e tecnologias usando `autenticar`.
+- Adicionamos o `COALESCE` no PUT para permitir alterar o status do projeto e manter o antigo caso não seja enviado outro.
+- Alteramos a validade do JWT de 2h para 1h para diminuir o tempo de utilização caso o token seja roubado.
+- Adicionamos quatro comentários sobre o `SEGREDO` e a Aula 29 no `server.js`.
+- O login retorna uma única resposta porque usamos `return` nos erros, interrompendo a função antes que outra resposta seja enviada.
+
+### Como rodar a API do zero
+
+Primeiro iniciamos o banco, executamos `setup.sql` e `usuarios.sql`, instalamos as dependências e criamos o usuário.
+
+Na raiz do repositório:
+
+```bash
+sudo service mariadb start
+sudo mariadb < portfolio-angular/sql/setup.sql
+sudo mariadb dwii_db < portfolio-angular/sql/usuarios.sql
+cd portfolio-angular/api-node
+npm install
+```
+
+Criamos o administrador com nosso próprio email e senha, sem publicar a senha no GitHub.
+
+```bash
+read -r -p "Email: " EMAIL
+read -r -s -p "Senha: " SENHA
+echo
+node criar-usuario.js "$EMAIL" "$SENHA"
+unset EMAIL SENHA
+node server.js
+```
+
+### Testes das alterações
+
+Os resultados abaixo são exemplos esperados e precisam ser conferidos no terminal.
+
+**GET público:**
+
+```bash
+curl -i http://localhost:3000/api/projetos
+# HTTP/1.1 200 OK
+# Corpo: [{"id":1,"nome":"Projeto publicado",...}]
+```
+
+**GET por ID inexistente:**
+
+```bash
+curl -i http://localhost:3000/api/projetos/99999
+# HTTP/1.1 404 Not Found
+# Corpo: {"erro":"projeto não encontrado"}
+```
+
+**POST, PUT e DELETE de projetos:**
+
+Usamos o token recebido no login e o ID retornado pelo POST.
+
+```bash
+TOKEN="COLE_SEU_TOKEN"
+ID=7
+
+curl -i -X POST http://localhost:3000/api/projetos -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"nome":"Teste","ano":2026}'
+# HTTP/1.1 201 Created
+# Corpo: {"id":7}
+
+curl -i -X PUT http://localhost:3000/api/projetos/$ID -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"nome":"Teste editado","ano":2026,"status":"publicado"}'
+# HTTP/1.1 200 OK
+# Corpo: {"mensagem":"Projeto atualizado"}
+
+curl -i -X DELETE http://localhost:3000/api/projetos/$ID -H "Authorization: Bearer $TOKEN"
+# HTTP/1.1 204 No Content
+# Corpo: vazio
+```
+
+**POST, PUT e DELETE de tecnologias:**
+
+```bash
+curl -i -X POST http://localhost:3000/api/tecnologias -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"nome":"Teste","categoria":"Backend"}'
+# HTTP/1.1 201 Created
+# Corpo: {"id":8}
+
+curl -i -X PUT http://localhost:3000/api/tecnologias/8 -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"nome":"Teste editado","categoria":"Backend"}'
+# HTTP/1.1 200 OK
+# Corpo: {"mensagem":"Tecnologia atualizado"}
+
+curl -i -X DELETE http://localhost:3000/api/tecnologias/8 -H "Authorization: Bearer $TOKEN"
+# HTTP/1.1 204 No Content
+# Corpo: vazio
+```
+
+### Os 7 testes da tranca
+
+**1. Login sem dados:**
+
+```bash
+curl -i -X POST http://localhost:3000/api/login -H "Content-Type: application/json" -d '{}'
+# HTTP/1.1 400 Bad Request
+# Corpo: {"erro":"Informe email e senha"}
+```
+
+**2. Login incorreto:**
+
+```bash
+curl -i -X POST http://localhost:3000/api/login -H "Content-Type: application/json" -d '{"email":"inexistente@teste.com","senha":"errada"}'
+# HTTP/1.1 401 Unauthorized
+# Corpo: {"erro":"Email e senha invalidos"}
+```
+
+**3. Login correto:**
+
+```bash
+curl -i -X POST http://localhost:3000/api/login -H "Content-Type: application/json" -d '{"email":"SEU_EMAIL","senha":"SUA_SENHA"}'
+# HTTP/1.1 200 OK
+# Corpo: {"token":"TOKEN_GERADO"}
+```
+
+**4. GET privado sem token:**
+
+```bash
+curl -i http://localhost:3000/api/projetos/todos
+# HTTP/1.1 401 Unauthorized
+# Corpo: {"erro":"Token ausente"}
+```
+
+**5. GET privado com token inválido:**
+
+```bash
+curl -i http://localhost:3000/api/projetos/todos -H "Authorization: Bearer invalido"
+# HTTP/1.1 401 Unauthorized
+# Corpo: {"erro":"Token invalido ou expirado"}
+```
+
+**6. GET privado com token válido:**
+
+```bash
+curl -i http://localhost:3000/api/projetos/todos -H "Authorization: Bearer $TOKEN"
+# HTTP/1.1 200 OK
+# Corpo: [{"id":1,"nome":"Teste","status":"rascunho",...}]
+```
+
+**7. DELETE sem token:**
+
+```bash
+curl -i -X DELETE http://localhost:3000/api/projetos/1
+# HTTP/1.1 401 Unauthorized
+# Corpo: {"erro":"Token ausente"}
+```
+
+### Rotas e autenticação
+
+| Rota                | Verbo  | Token |
+| ------------------- | ------ | ----- |
+| /api/projetos       | GET    | Não   |
+| /api/projetos/      | GET    | Não   |
+| /api/projetos/todos | GET    | Sim   |
+| /api/projetos       | POST   | Sim   |
+| /api/projetos/      | PUT    | Sim   |
+| /api/projetos/      | DELETE | Sim   |
+| /api/tecnologias    | GET    | Não   |
+| /api/tecnologias    | POST   | Sim   |
+| /api/tecnologias/   | PUT    | Sim   |
+| /api/tecnologias/   | DELETE | Sim   |
+| /api/login          | POST   | Não   |
+
+### O que esta API ainda não faz
+
+- Não possui recuperação de senha por email.
+- Não permite invalidar individualmente um token JWT antes de ele expirar.
+
+### GitHub
+
+Adicionamos `.gitignore` com `node_modules/` e retiramos as dependências do versionamento.

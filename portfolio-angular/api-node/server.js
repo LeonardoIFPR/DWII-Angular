@@ -7,6 +7,10 @@ const jwt = require("jsonwebtoken");
 const app = express();
 const PORTA = 3000;
 const SEGREDO = "24446666688888888"
+//Aula 29: O SEGREDO é usado para assinar e verificar o JWT. Se o SEGREDO usado na verificação for diferente do utilizado na assinatura, o token não será validado.
+//geralmente fica em um arquivo .env para segurança 
+//caso a variavel seja descoberta seria precisso alterala para invalidar os logins e manter a segurança em um sistema real 
+//Não deve ser publicado direto no github e chumbado no codigo como estamos fazendo deveria estar em um arquivo .env mas para estudar o funcionamento assim funciona
 
 app.use(cors());
 app.use(express.json())
@@ -31,15 +35,30 @@ app.get("/api/tecnologias", async (req, res) => {
     }
 });
 
+app.get("/api/projetos/todos", autenticar, async (req, res) => {
+    try {
+        const sql = "select id, nome, descricao, tecnologias, link_github, ano, status from projetos order by ano desc, id desc";
+        const [projetos] = await pool.query(sql);
+        res.status(200).json(projetos);
+    } catch (erro) {
+        res.status(500).json({ erro: "Não foi possível carregar todos os projetos" });
+    }
+});
+
 
 app.get("/api/projetos/:id", async (req, res) => {
-    const sql = "select id , nome, descricao, link_github, ano from projetos where id = ? and status = 'publicado'";
-    const [linhas] = await pool.execute(sql, [req.params.id]);
-    if (linhas.length === 0) {
-        return res.status(404).json({ erro: "projeto não encontrado"});
+    try {
+        const sql = "select id , nome, descricao, link_github, ano from projetos where id = ? and status = 'publicado'";
+        const [linhas] = await pool.execute(sql, [req.params.id]);
+        if (linhas.length === 0) {
+            return res.status(404).json({ erro: "projeto não encontrado"});
+        }
+        res.json(linhas[0]);
+    } catch (erro) {
+        res.status(500).json({ erro: "falha no servidor" + erro.message});
     }
-    res.json(linhas[0]);
 });
+
 
 app.post("/api/projetos", autenticar, async (req, res) => {
     try {
@@ -50,7 +69,7 @@ app.post("/api/projetos", autenticar, async (req, res) => {
         }
         const sql = "insert into projetos (nome, descricao, tecnologias, link_github, ano, status) values (?, ?, ?, ?, ?, ?)";
         const [resultado] = await pool.execute(sql, [
-            dados.nome, dados.descricao ?? "", dados.tecnologias ?? "", dados.link_github ?? "", dados.ano ?? new Date().getFullYear(), "publicado"
+            dados.nome, dados.descricao ?? "", dados.tecnologias ?? "", dados.link_github ?? "", dados.ano ?? new Date().getFullYear(), dados.status ?? "publicado"
         ]);
         res.status(201).json({id: resultado.insertId });
     } catch (erro) {
@@ -64,9 +83,9 @@ app.put("/api/projetos/:id", autenticar, async (req, res) => {
         if (!dados || !dados.nome) {
             return res.status(400).json({ erro: "Informe pelo menos o nome do projeto"});
         }
-        const sql = "update projetos set nome=?, descricao=?, tecnologias=?, link_github=?, ano=? where id=?";
+        const sql = "update projetos set nome=?, descricao=?, tecnologias=?, link_github=?, ano=?, status=COALESCE(?, status) where id=?";//usei o COALESCE para poder alterar o status do projeto sem mexer nos outros dados e caso não envie um novo status ele mantera o antigo 
         const [resultado] = await pool.execute(sql, [
-            dados.nome, dados.descricao ?? "", dados.tecnologias ?? "", dados.link_github ?? "", dados.ano ?? new Date().getFullYear(), req.params.id
+            dados.nome, dados.descricao ?? "", dados.tecnologias ?? "", dados.link_github ?? "", dados.ano ?? new Date().getFullYear(), dados.status ?? null, req.params.id
         ]);
         if (resultado.affectedRows === 0) {
             return res.status(404).json({ erro: "projeto não encontrado" });
@@ -77,7 +96,7 @@ app.put("/api/projetos/:id", autenticar, async (req, res) => {
     };
 });
 
-app.delete("/api/projetos/:id", async (req, res) => {
+app.delete("/api/projetos/:id", autenticar, async (req, res) => {
     try {
         const [resultado] = await pool.execute("delete from projetos where id = ?", [req.params.id]);
         if (resultado.affectedRows === 0) {
@@ -115,10 +134,10 @@ app.put("/api/tecnologias/:id", autenticar, async (req, res) => {
         }
         const sql = "update tecnologias set nome=?, categoria=?, descricao=?, ano_criacao=? where id=?";
         const [resultado] = await pool.execute(sql, [
-            dados.nome, dados.categoria ?? "", dados.descricao ?? "", dados.ano ?? new Date().getFullYear(), req.params.id
+            dados.nome, dados.categoria ?? "", dados.descricao ?? "", dados.ano_criacao ?? new Date().getFullYear(), req.params.id
         ]);
         if (resultado.affectedRows === 0) {
-            return res.status(404).json({ erro: "projeto não encontrado" });
+            return res.status(404).json({ erro: "tecnologia não encontrada" });
         }
         res.json({ mensagem: "Tecnologia atualizado" });
     } catch (erro) {
@@ -126,7 +145,7 @@ app.put("/api/tecnologias/:id", autenticar, async (req, res) => {
     };
 });
 
-app.delete("/api/tecnologias/:id", async (req, res) => {
+app.delete("/api/tecnologias/:id", autenticar, async (req, res) => {
     try {
         const [resultado] = await pool.execute("delete from tecnologias where id = ?", [req.params.id]);
         if (resultado.affectedRows === 0) {
@@ -153,7 +172,7 @@ app.post("/api/login", async (req, res) => {
         if (!confere) {
             return res.status(401).json({erro: "Email ou senha invalidos"});
         }
-        const token = jwt.sign({ id: usuario.id, email: usuario.email }, SEGREDO, {expiresIn: "2h"}); 
+        const token = jwt.sign({ id: usuario.id, email: usuario.email }, SEGREDO, {expiresIn: "1h"}); 
         res.json({ token });
     } catch (erro) {
         res.status(500).json({ erro: "Falha no servidor: " + erro.message})
