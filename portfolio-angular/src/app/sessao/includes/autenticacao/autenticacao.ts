@@ -23,10 +23,10 @@ export class Autenticacao {
   sucesso = "";
   enviando = false;
 
-  form = this.fb.group({
+form = this.fb.group({
     senha: ['', [Validators.required, Validators.minLength(3)]],
-    usuario: ['', [Validators.required, Validators.minLength(3)]],
-  });
+    email: ['', [Validators.required, Validators.email]],
+});
 
   onSubmit() {
     if (this.form.invalid) return;
@@ -37,10 +37,10 @@ export class Autenticacao {
     const dadosLogin = this.form.value;
     
     this.service.fazerLogin(dadosLogin).subscribe({
-      next: (resposta: any) => {
-        this.service.liberarAcesso();
+    next: (resposta: any) => {
+        this.service.liberarAcesso(resposta.token);
         this.router.navigate(['/gestao']); 
-      },
+    },
       error: (erro: any) => {
         this.erro = "Usuário ou senha incorretos!"; 
         this.enviando = false;
