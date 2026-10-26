@@ -275,3 +275,13 @@ curl -i -X DELETE http://localhost:3000/api/projetos/1
 ### GitHub
 
 Adicionamos `.gitignore` com `node_modules/` e retiramos as dependências do versionamento.
+
+### Aula 25: O portfolio em React
+
+o front novo nasce em "portfolio-react/" (Vite + REACT), o lado do Angular. Para rodar 
+
+    cd portfolio-react
+    npm install
+    npm run dev
+
+A tela abre na porta 5173. Por enquanto os projetos são fixos no "src/App.jsx"; a Aula 27 os traz da API
