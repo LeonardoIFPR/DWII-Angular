@@ -1,4 +1,3 @@
-import { setEnvironmentData } from "node:worker_threads";
 import { useState } from "react";
 
 function Contato () {
