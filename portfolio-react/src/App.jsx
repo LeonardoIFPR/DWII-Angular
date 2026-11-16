@@ -9,7 +9,7 @@ function App() {
   
   const [projetos, setProjetos] = useState([]);
   const [carregando, setCarregando] = useState(true);
-  const [erro, setErro] = useStat("")
+  const [erro, setErro] = useState("")
 
   async function buscarProjetos() {
     try{
