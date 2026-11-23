@@ -1,18 +1,64 @@
-function Cabecalho() {
+import { useState } from 'react';
+import API from './api.js';
+
+function Gestao() {
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [token, setToken] = useState(localStorage.getItem('token') ?? '');
+  const [erro, setErro] = useState('');
+
+  async function entrar(e) {
+    e.preventDefault();
+    setErro('');
+    try {
+      const resposta = await fetch(API + '/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, senha: senha }),
+      });
+      const dados = await resposta.json();
+      if (!resposta.ok) {
+        throw new Error(dados.erro);
+      }
+      localStorage.setItem('token', dados.token);
+      setToken(dados.token);
+    } catch (falha) {
+      setErro('Não deu para entrar: ' + falha.message);
+    }
+  }
+
+  function sair() {
+    localStorage.removeItem('token');
+    setToken('');
+  }
+
+  if (!token) {
+    return (
+      <section className="gestao">
+        <h2>Gestão</h2>
+        <form onSubmit={entrar}>
+          <label>
+            E-mail
+            <input name="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          </label>
+          <label>
+            Senha
+            <input name="senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} />
+          </label>
+          <button type="submit">Entrar</button>
+        </form>
+        {erro && <p className="erro">{erro}</p>}
+      </section>
+    );
+  }
+
   return (
-    <main>
-      <header>
-      <h1>Meu portfolio</h1>
-      <nav>
-        <a href="#">Inicio</a>
-        <a href="#">Sobre</a>
-        <a href="#">Projetos</a>
-        <a href="#">Contato</a>
-      </nav>
-      </header>
-      <p>Em breve, em React</p>
-    </main>
+    <section className="gestao">
+      <h2>Gestão</h2>
+      <p>Você entrou. O token está guardado.</p>
+      <button onClick={sair}>Sair</button>
+    </section>
   );
 }
 
-export default Cabecalho;
+export default Gestao;
